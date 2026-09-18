@@ -1,3 +1,8 @@
+
+
+<img width="1326" height="1186" alt="e14d9890-d2d5-43e5-a00f-f91943ae0be2" src="https://github.com/user-attachments/assets/e2dbb6b8-53c8-4250-8560-2ffe6b248292" />
+
+
 # synapse.aqua
 **synapse.wtf but for aquabeary fallen survival**
 
