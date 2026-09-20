@@ -347,19 +347,9 @@ do -- other
     end;
     --
     blur_effect = cloneref(Instance.new("BlurEffect", lighting));
-    black_bg = Instance_manager.new("TextButton", {
-        Name = "bg_effect";
-        Text = "";
-        AutoButtonColor = false;
-        Size = udim2(9999, 0, 9999, 0);
-        BorderColor3 = UI.themes.outline;
-        Position = udim2(0, 0, 0, -100);
-        ZIndex = -9999;
-        BackgroundColor3 = color3_rgb(0, 0, 0);
-        Visible = UI.autoload;
-        BackgroundTransparency = 0.35;
-        Parent = cloneref(Instance.new("ScreenGui", gethui()));
-    });
+    blur_effect.Size = 0;
+    blur_effect.Enabled = false;
+    black_bg = nil;
 end
 --
 do -- menu
@@ -3117,8 +3107,7 @@ do -- open/close
             pcall(function()
                 UI.autoload = not UI.autoload
                 UI.menu_gui.Enabled = UI.autoload
-                black_bg.Visible = UI.autoload
-                blur_effect.Size = UI.autoload and 20 or 0
+                -- black_bg / blur intentionally left untouched
             end);
         end;
     end);
@@ -3219,5 +3208,4 @@ function UI:Menu(tab)
         end;
     end});
 end;
-
 return {UI, framework, fonts, black_bg, blur_effect};
