@@ -67,7 +67,7 @@ if not LP.Character then
 end
 task.wait(0.5)
 
-local AQUA = "https://raw.githubusercontent.com/6nt0n/synapse.aqua/refs/heads/main/aqua"
+local AQUA = "https://raw.githubusercontent.com/6nt0n/synapse.aqua/refs/heads/main/aqua?v=" .. tostring(os.time())
 local body = game:HttpGet(AQUA, true)
 print("[payload] aqua fetched:", #body)
 
