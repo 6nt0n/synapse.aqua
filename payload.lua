@@ -8,13 +8,18 @@ local MODS = RS:WaitForChild("Modules", 30)
 local _req = require
 
 local function null()
-    return setmetatable({}, {
-        __index    = function() return null() end,
+    local proxy
+    proxy = setmetatable({}, {
+        __index    = function(self) return self end,
         __newindex = function() end,
-        __call     = function() return null() end,
+        __call     = function(self) return self end,
         __len      = function() return 0 end,
         __tostring = function() return "" end,
+        __eq       = function() return false end,
+        __metatable = false,
+        __type     = "table",
     })
+    return proxy
 end
 
 local ac_names = { Kz = true, UoEx = true, uili = true, Cyz = true }
