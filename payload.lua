@@ -164,9 +164,23 @@ task.spawn(function()
     end
 end)
 
-local AQUA = "https://raw.githubusercontent.com/6nt0n/synapse.aqua/refs/heads/main/aqua"
+local AQUA = "https://raw.githubusercontent.com/6nt0n/synapse.aqua/refs/heads/main/aqua.lua"
 
-task.wait(0.1)
+-- wait for the local player to actually exist — we fired so early the engine
+-- hadn't populated Players.LocalPlayer yet when aqua tried to read it
+local Players = game:GetService("Players")
+if not Players.LocalPlayer then
+    print("[aqua] waiting for LocalPlayer...")
+    Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+end
+
+local lp = Players.LocalPlayer
+if not lp.Character then
+    print("[aqua] waiting for character...")
+    lp.CharacterAdded:Wait()
+end
+
+task.wait(0.5)
 
 local ok, err = pcall(function()
     loadstring(game:HttpGet(AQUA, true))()
