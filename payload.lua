@@ -1,7 +1,14 @@
 local RS      = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Run     = game:GetService("RunService")
-local LP      = Players.LocalPlayer
+
+-- wait for LocalPlayer BEFORE binding any local to it
+local LP = Players.LocalPlayer
+if not LP then
+    print("[payload] waiting for LocalPlayer")
+    Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+    LP = Players.LocalPlayer
+end
 
 local function waitForMainGame(timeout)
     local deadline = tick() + (timeout or 30)
@@ -27,7 +34,7 @@ end
 
 local MODS = waitForMainGame(30)
 if not MODS then
-    warn("aqua payload: never saw main game modules, aborting")
+    warn("[payload] never saw main game modules, aborting")
     return
 end
 
@@ -158,9 +165,15 @@ local function reap_conns()
     local sigs = {
         Run.Heartbeat, Run.RenderStepped,
         Run.PreSimulation, Run.PostSimulation, Run.Stepped,
-        Players.PlayerAdded, Players.PlayerRemoving,
-        LP.CharacterAdded, LP.CharacterRemoving, LP.Idled,
     }
+    if LP then
+        table.insert(sigs, LP.CharacterAdded)
+        table.insert(sigs, LP.CharacterRemoving)
+        table.insert(sigs, LP.Idled)
+    end
+    table.insert(sigs, Players.PlayerAdded)
+    table.insert(sigs, Players.PlayerRemoving)
+
     for _, s in ipairs(sigs) do
         local ok, conns = pcall(getconnections, s)
         if ok and type(conns) == "table" then
@@ -186,23 +199,25 @@ task.spawn(function()
     end
 end)
 
-local AQUA = "https://raw.githubusercontent.com/6nt0n/synapse.aqua/refs/heads/main/aqua.lua"
+-- correct URL: no .lua extension
+local AQUA = "https://raw.githubusercontent.com/6nt0n/synapse.aqua/refs/heads/main/aqua"
 
-if not Players.LocalPlayer then
-    print("aqua: waiting for LocalPlayer")
-    Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+-- aqua needs the character up before it loads
+if not LP.Character then
+    print("[payload] waiting for character")
+    LP.CharacterAdded:Wait()
 end
-
-local lp = Players.LocalPlayer
-if not lp.Character then
-    print("aqua: waiting for character")
-    lp.CharacterAdded:Wait()
-end
-
 task.wait(0.5)
 
+local body_ok, body = pcall(game.HttpGet, game, AQUA, true)
+if not body_ok or type(body) ~= "string" or #body < 500 then
+    warn("[payload] aqua fetch failed or too small. len:", type(body) == "string" and #body or "n/a")
+    return
+end
+print("[payload] aqua fetched, len:", #body)
+
 local ok, err = pcall(function()
-    loadstring(game:HttpGet(AQUA, true))()
+    loadstring(body)()
 end)
 if not ok then
     warn("aqua boot fail:", err)
