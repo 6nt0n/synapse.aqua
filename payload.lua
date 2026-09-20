@@ -140,10 +140,12 @@ mt.__namecall = newcclosure(function(self, ...)
     return old_nc(self, ...)
 end)
 
+local cached_char = LP.Character
+LP.CharacterAdded:Connect(function(c) cached_char = c end)
+LP.CharacterRemoving:Connect(function() cached_char = nil end)
 mt.__index = newcclosure(function(self, p)
     local v = old_idx(self, p)
-    if LP.Character and self == LP.Character
-       and p == "AssemblyLinearVelocity" and typeof(v) == "Vector3" then
+    if self == cached_char and p == "AssemblyLinearVelocity" and typeof(v) == "Vector3" then
         if v.Magnitude > 100 then return v.Unit * 100 end
     end
     return v
