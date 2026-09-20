@@ -181,6 +181,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
+
 local def_color = color3_fromrgb(128, 128, 242);
 
 local camera = workspace.CurrentCamera;
@@ -201,7 +202,6 @@ local_player.CharacterAdded:Connect(function(character) local_char = character e
 local_player.CharacterRemoving:Connect(function()
     if _silent_melee then _silent_melee.target = nil; _silent_melee.until_t = 0 end
 end);
-
 local sky = lighting:FindFirstChildOfClass("Sky") or Instance.new("Sky", lighting);
 local atmosphere = lighting:FindFirstChild("Atmosphere");
 local folder = workspace:FindFirstChild("VFX") and workspace.VFX:FindFirstChild("VMs");
