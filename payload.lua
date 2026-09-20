@@ -216,9 +216,11 @@ if not body_ok or type(body) ~= "string" or #body < 500 then
 end
 print("[payload] aqua fetched, len:", #body)
 
-local ok, err = pcall(function()
+local ok, err = xpcall(function()
     loadstring(body)()
+end, function(e)
+    return tostring(e) .. "\n" .. debug.traceback("", 2)
 end)
 if not ok then
-    warn("aqua boot fail:", err)
+    warn("aqua boot fail:\n" .. err)
 end
