@@ -3,7 +3,33 @@ local Players = game:GetService("Players")
 local Run     = game:GetService("RunService")
 local LP      = Players.LocalPlayer
 
-local MODS = RS:WaitForChild("Modules", 30)
+local function waitForMainGame(timeout)
+    local deadline = tick() + (timeout or 30)
+    local needed = { "chickenfried", "Items", "SettingsModule", "roosterchickens", "SoundModule" }
+    while tick() < deadline do
+        local m = RS:FindFirstChild("Modules")
+        if m then
+            local all = true
+            for _, n in ipairs(needed) do
+                if not m:FindFirstChild(n) then all = false break end
+            end
+            if all then
+                local SS = game:GetService("SoundService")
+                if SS:FindFirstChild("Hit") and SS:FindFirstChild("HitHead") then
+                    return m
+                end
+            end
+        end
+        task.wait(0.25)
+    end
+    return nil
+end
+
+local MODS = waitForMainGame(30)
+if not MODS then
+    warn("aqua payload: never saw main game modules, aborting")
+    return
+end
 
 local _req = require
 
@@ -17,7 +43,6 @@ local function null()
         __tostring = function() return "" end,
         __eq       = function() return false end,
         __metatable = false,
-        __type     = "table",
     })
     return proxy
 end
@@ -91,7 +116,6 @@ setreadonly(mt, false)
 
 mt.__namecall = newcclosure(function(self, ...)
     local m = getnamecallmethod()
-    local a = {...}
 
     if (m == "Kick" or m == "Disconnect") and self == LP then
         return
@@ -166,17 +190,14 @@ end)
 
 local AQUA = "https://raw.githubusercontent.com/6nt0n/synapse.aqua/refs/heads/main/aqua.lua"
 
--- wait for the local player to actually exist — we fired so early the engine
--- hadn't populated Players.LocalPlayer yet when aqua tried to read it
-local Players = game:GetService("Players")
 if not Players.LocalPlayer then
-    print("[aqua] waiting for LocalPlayer...")
+    print("aqua: waiting for LocalPlayer")
     Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 end
 
 local lp = Players.LocalPlayer
 if not lp.Character then
-    print("[aqua] waiting for character...")
+    print("aqua: waiting for character")
     lp.CharacterAdded:Wait()
 end
 
