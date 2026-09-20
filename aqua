@@ -22,7 +22,7 @@ end
 
 rconsoleprint("init\n")
 -- 
-p("init 2")
+rconsoleprint("init 2")
 
 local menu, fonts, UI, framework, flags;
 do -- startup   
