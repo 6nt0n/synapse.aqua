@@ -2,13 +2,19 @@ local RS      = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Run     = game:GetService("RunService")
 
--- wait for LocalPlayer BEFORE binding any local to it
+-- poll; signal wait misses the event when we fire before the property exists
 local LP = Players.LocalPlayer
-if not LP then
-    print("[payload] waiting for LocalPlayer")
-    Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+local waited = 0
+while not LP do
+    task.wait(0.1)
+    waited = waited + 0.1
     LP = Players.LocalPlayer
+    if waited > 30 then
+        warn("[payload] LocalPlayer never appeared after 30s")
+        return
+    end
 end
+print(string.format("[payload] LP ready after %.1fs: %s", waited, LP.Name))
 
 local function waitForMainGame(timeout)
     local deadline = tick() + (timeout or 30)
@@ -203,9 +209,15 @@ end)
 local AQUA = "https://raw.githubusercontent.com/6nt0n/synapse.aqua/refs/heads/main/aqua"
 
 -- aqua needs the character up before it loads
+if not LP then
+    warn("[payload] LP is nil at character wait, aborting")
+    return
+end
 if not LP.Character then
     print("[payload] waiting for character")
-    LP.CharacterAdded:Wait()
+    while not LP.Character do
+        LP.CharacterAdded:Wait()
+    end
 end
 task.wait(0.5)
 
