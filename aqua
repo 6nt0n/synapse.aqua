@@ -182,9 +182,20 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
 local def_color = color3_fromrgb(128, 128, 242);
-local camera = workspace["CurrentCamera"];
-local viewport_size = camera["ViewportSize"];
-local local_player = players["LocalPlayer"];
+
+local camera = workspace.CurrentCamera;
+if not camera then
+    workspace:GetPropertyChangedSignal("CurrentCamera"):Wait();
+    camera = workspace.CurrentCamera;
+end
+local viewport_size = camera.ViewportSize;
+
+local local_player = players.LocalPlayer;
+if not local_player then
+    players:GetPropertyChangedSignal("LocalPlayer"):Wait();
+    local_player = players.LocalPlayer;
+end
+
 local local_char = local_player.Character or local_player.CharacterAdded:Wait();
 local_player.CharacterAdded:Connect(function(character) local_char = character end);
 local_player.CharacterRemoving:Connect(function()
