@@ -33,18 +33,16 @@ end
 
 local _req = require
 
-local function null()
-    local proxy
-    proxy = setmetatable({}, {
-        __index    = function(self) return self end,
+local function null(depth)
+    depth = depth or 0
+    if depth >= 3 then return nil end
+    return setmetatable({}, {
+        __index    = function() return null(depth + 1) end,
         __newindex = function() end,
-        __call     = function(self) return self end,
+        __call     = function() return null(depth + 1) end,
         __len      = function() return 0 end,
         __tostring = function() return "" end,
-        __eq       = function() return false end,
-        __metatable = false,
     })
-    return proxy
 end
 
 local ac_names = { Kz = true, UoEx = true, uili = true, Cyz = true }
