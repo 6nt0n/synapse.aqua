@@ -88,7 +88,7 @@ local UI = ({
     keybind_list = nil,
     themes = {
         Default = {
-            accent = color3_rgb(128, 128, 242),
+            accent = color3_rgb(255, 105, 180),
             risky = color3_rgb(200, 0, 0),
             background = color3_rgb(36, 36, 36),
             outline = color3_rgb(45, 45, 45),
@@ -999,19 +999,30 @@ do -- menu
 
             UI:AttachTheme(background2, { BackgroundColor3 = "background" })
 
+            local assumptionsLogoAsset
+            pcall(function()
+                local makeAsset = getcustomasset or getsynasset
+                local logoPath = "ENHANCEMENTS/MENU/assumptions.png"
+                if type(makeAsset) == "function" and type(isfile) == "function" and isfile(logoPath) then
+                    assumptionsLogoAsset = makeAsset(logoPath)
+                end
+            end)
+
             local imagetoptab = Instance_manager.new("ImageLabel", {
                 Name = "topimg";
                 Parent = background;
                 Position = udim2(0, 5, 0, 15);
                 Size = udim2(0,70,0,70);
                 BackgroundTransparency = 1;
-                --ImageColor3 = Color3.fromRGB(255, 255, 255);
                 BorderSizePixel = 0;
                 ZIndex = 9999;
-                Image = "http://www.roblox.com/asset/?id=93345810428641";
+                Image = assumptionsLogoAsset or "http://www.roblox.com/asset/?id=93345810428641";
+                ImageColor3 = Color3.fromRGB(255, 255, 255);
             });
 
-            UI:AttachTheme(imagetoptab, { ImageColor3 = "accent" })
+            if not assumptionsLogoAsset then
+                UI:AttachTheme(imagetoptab, { ImageColor3 = "accent" })
+            end
 
             local line_thingy2 = Instance_manager.new("Frame", {
                 Name = "line";
